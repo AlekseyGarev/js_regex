@@ -3,39 +3,43 @@ const Validator = require('../Validator');
 describe('Validator.validateUsername', () => {
     
     describe('Positive cases (Valid usernames)', () => {
-        test('Должен разрешать простые буквенно-цифровые имена', () => {
-            expect(Validator.validateUsername('user123')).toBe(false);
-            expect(Validator.validateUsername('John_Doe')).toBe(true);
-        });
-
-        test('должно разрешать имена пользователей со средними дефисами и символами подчеркивания', () => {
-            expect(Validator.validateUsername('my-name-is-bond')).toBe(true);
+        test.each([
+            ['John_Doe', 'обычные буквы и подчеркивание'],
+            ['my-name-is-bond', 'дефисы внутри имени'],
+            ['u123r', 'цифры (не более 3 подряд) внутри'],
+        ])('Должен разрешать: %s (%s)', (username) => {
+            expect(Validator.validateUsername(username)).toBe(true);
         });
     });
 
     describe('Negative cases (Invalid patterns)', () => {
-        test('НЕ должно начинаться с цифр, дефисов или символов подчеркивания', () => {
-            expect(Validator.validateUsername('1user')).toBe(false);
-            expect(Validator.validateUsername('-user')).toBe(false);
-            expect(Validator.validateUsername('_user')).toBe(false);
+        
+        test.each([
+            ['1user', 'начинается с цифры'],
+            ['-user', 'начинается с дефиса'],
+            ['_user', 'начинается с подчеркивания'],
+            ['user1', 'заканчивается цифрой'],
+            ['user-', 'заканчивается дефисом'],
+            ['user_', 'заканчивается подчеркиванием'],
+        ])('НЕ должен разрешать недопустимые края: %s (%s)', (username) => {
+            expect(Validator.validateUsername(username)).toBe(false);
         });
 
-        test('НЕ должно заканчиваться цифрами, дефисами или символами подчеркивания', () => {
-            expect(Validator.validateUsername('user1')).toBe(false);
-            expect(Validator.validateUsername('user-')).toBe(false);
-            expect(Validator.validateUsername('user_')).toBe(false);
+        test.each([
+            ['user123', 'ровно 3 цифры'],
+            ['user1234', 'более 3 цифр'],
+            ['123456', 'только цифры'],
+        ])('НЕ должен разрешать длинные последовательности цифр: %s (%s)', (username) => {
+            expect(Validator.validateUsername(username)).toBe(false);
         });
 
-        test('НЕ должно содержать более 3 цифр подряд', () => {
-            expect(Validator.validateUsername('user123')).toBe(false);
-            expect(Validator.validateUsername('user1234')).toBe(false);
-        });
-
-        test('НЕ должно содержать запрещенные специальные символы', () => {
-            expect(Validator.validateUsername('user!name')).toBe(false);
-            expect(Validator.validateUsername('user@domain')).toBe(false);
-            expect(Validator.validateUsername('user name')).toBe(false);
+        test.each([
+            ['user!name'],
+            ['user@domain'],
+            ['user name'],
+            ['юзер'],
+        ])('НЕ должен разрешать спецсимволы или пробелы: %s', (username) => {
+            expect(Validator.validateUsername(username)).toBe(false);
         });
     });
 });
-
