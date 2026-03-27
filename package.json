@@ -1,5 +1,5 @@
 {
-  "name": "js_regex",
+  "name": "js_-destructuring",
   "version": "1.0.0",
   "description": "",
   "license": "ISC",
@@ -10,6 +10,10 @@
     "test": "jest"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.1.0",
+    "eslint-plugin-vue": "^10.8.0",
+    "globals": "^17.4.0",
     "jest": "^30.3.0"
   }
 }
